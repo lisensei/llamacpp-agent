@@ -1,4 +1,4 @@
-from flask import Flask,request
+from flask import Flask,request,jsonify
 from langchain_community.llms import LlamaCpp
 from langchain.agents import create_react_agent,AgentExecutor
 from langchain_community.tools.tavily_search import TavilySearchResults
@@ -22,8 +22,9 @@ app.config["local_model"]=args.local_model
 ids={"bot":"<|begin_of_text|>",
 "shi":"<|start_header_id|>",
 "ehi":"<|end_header_id|>",
-"eot":"<|eot_id|>"}
-temp='''You are an accurate intelligent system. You one and only task is answer any questions. You must use this tool: {tools}, to search for information. 
+"eot":"<|eot_id|>",
+"character":"intelligent system"}
+temp='''You are an accurate {character}. You one and only task is answer any questions. You must use this tool: {tools}, to search for information. 
 The name of the tool is: {tool_names}.
 
 You should use the following pattern to answer questions:
@@ -48,11 +49,11 @@ Observation: Based on the result returned from tavily_search_results_json, the a
 Final Answer: The meaning of life is 42.
 
 Question: What's Llama 3?
-Thought: To find the answer to this question, I must use search the Internet using tavily_search_results_json
+Thought: To find the answer to this question, I must search the Internet using tavily_search_results_json
 Action: tavily_search_results_json
 Action Input: What's Llama3?
-Observation:  After search the web using tavily_search_results_json, I now know llama 3 is a open source LLM.
-Final Answer: Llama 3 is a open source large language model.
+Observation:  After search the web using tavily_search_results_json, I now know llama 3 is an open source LLM.
+Final Answer: Llama 3 is an open source large language model.
 
 Remember, the tool's name is case sensitive, you must use this exact tool name: tavily_search_results_json
 
@@ -65,7 +66,7 @@ assistant='''Question: {input}
 def streaming():
     if app.config["local_model"]:
         model=LlamaCpp(model_path=app.config["model_path"],n_gpu_layers=args.gpu_layers,n_ctx=args.context_length,max_tokens=args.max_tokens,temperature=args.temperature)
-        prompt=PromptTemplate.from_template('''{bot}{shi}system{ehi}'''+temp+'''{shi}intelligent system{ehi}'''+assistant)
+        prompt=PromptTemplate.from_template('''{bot}{shi}system{ehi}'''+temp+'''{shi}{character}{ehi}'''+assistant)
     else:
         model=ChatGroq(temperature=0,model="llama3-70b-8192")
         prompt=ChatPromptTemplate.from_messages([("system",temp),("assistant",assistant)])
@@ -78,14 +79,16 @@ def streaming():
         ids={"bot":"",
         "shi":"",
         "ehi":"",
-        "eot":""}
+        "eot":"",
+        "character":""}
     else:
         ids={"bot":"<|begin_of_text|>",
         "shi":"<|start_header_id|>",
         "ehi":"<|end_header_id|>",
-        "eot":"<|eot_id|>"}
+        "eot":"<|eot_id|>",
+        "character":"intelligent system"}
     result=agent.invoke(ids|{"input":question})
-    return result["output"],200
+    return jsonify(result),200
 
 if __name__ == "__main__":
     app.run(debug=True,host="0.0.0.0",port=6000)
