@@ -69,7 +69,8 @@ def streaming():
         prompt=PromptTemplate.from_template('''{bot}{shi}system{ehi}'''+temp+'''{shi}{character}{ehi}'''+assistant)
     else:
         model=ChatGroq(temperature=0,model="llama3-70b-8192")
-        prompt=ChatPromptTemplate.from_messages([("system",temp),("assistant",assistant)])
+        #prompt=ChatPromptTemplate.from_messages([("system",temp),("assistant",assistant)])
+        prompt=PromptTemplate.from_template('''{bot}{shi}system{ehi}'''+temp+'''{shi}{character}{ehi}'''+assistant)
 
     question=request.json["question"]
     tools=[TavilySearchResults(max_results=1)]
