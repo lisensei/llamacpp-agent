@@ -36,7 +36,7 @@ Action Input: The parameters passed to the action
 Observation: The result of taking the action
 Final Answer: The final answer to the question
 
-The Thought-Action-Action Input-Observataion process can repeat at most 2 times. When you can't find the answer, summarize the information you got and provide the website links of such information.
+The Thought-Action-Action Input-Observataion process can repeat at most 1 time. When you can't find the answer, summarize the information you got and provide the website links of such information.
 
 
 Here are two examples:
@@ -46,6 +46,7 @@ Thought: To answer this question, I should search the web using tavily_search_re
 Action: tavily_search_results_json
 Action Input: What's the meaning of life?
 Observation: Based on the result returned from tavily_search_results_json, the answer to the question is 42.
+Thought: The information is enough for making a conclusion. I now know the answer.
 Final Answer: The meaning of life is 42.
 
 Question: What's Llama 3?
@@ -53,6 +54,7 @@ Thought: To find the answer to this question, I must search the Internet using t
 Action: tavily_search_results_json
 Action Input: What's Llama3?
 Observation:  After search the web using tavily_search_results_json, I now know llama 3 is an open source LLM.
+Thought: I have found the answer.
 Final Answer: Llama 3 is an open source large language model.
 
 Remember, the tool's name is case sensitive, you must use this exact tool name: tavily_search_results_json
